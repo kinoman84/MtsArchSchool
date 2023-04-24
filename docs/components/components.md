@@ -12,45 +12,54 @@
 AddElementTag("microService", $shape=EightSidedShape(), $bgColor="CornflowerBlue", $fontColor="white", $legendText="microservice")
 AddElementTag("storage", $shape=RoundedBoxShape(), $bgColor="lightSkyBlue", $fontColor="white")
 
-Person(customer, "Покупатель", "B2C клиент")
+Person(speaker, "Speaker", "Любой желающий выступить на конференции")
+Person(reviewer, "Reviewer", "Эксперт предметной области")
+Person(organizer, "Organizer", "Сотрудник комании")
+Person(guest, "Guest", "Любой желающий послушать доклады")
+System_Ext(notification, "Notification service", "Сервис уведомлений")
+System_Ext(streaming, "Streaming service", "сервис для просмотра онлайн трансляций и записанных конференций")
 
-System_Boundary(c, "MTS Shop Lite") {
-   Container(app, "Клиентское веб-приложение", "html, JavaScript, Angular", "Портал интернет-магазина")
-   Container(offering_service, "Product Offering Service", "Java, Spring Boot", "Сервис управления продуктовым предложением", $tags = "microService")      
-   ContainerDb(offering_db, "Product Catalog", "PostgreSQL", "Хранение продуктовых предложений", $tags = "storage")
+System_Boundary(conf, "Helloconf") {
+   Container(app, "Клиентское веб-приложение", "html, JavaScript, Angular", "Web портал")
    
-   Container(ordering_service, "Product Ordering Service", "Golang, nginx", "Сервис управления заказом", $tags = "microService")      
-   ContainerDb(ordering_db, "Order Inventory", "MySQL", "Хранение заказов", $tags = "storage")
-    
-   Container(message_bus, "Message Bus", "RabbitMQ", "Транспорт для бизнес-событий")
-   Container(audit_service, "Audit Service", "C#/.NET", "Сервис аудита", $tags = "microService")      
-   Container(audit_store, "Audit Store", "Event Store", "Хранение произошедших события для аудита", $tags = "storage")
+   Container(authServ, "Authorization service", "Java, Spring Boot", "Сервис авторизации", $tags = "microService")
+   ContainerDb(authDb, "Users", "PostgreSQL", "Хранение информации о пользователях", $tags = "storage")
+   
+   Container(confServ, "Conference service", "Java, Spring Boot", "Сервис конференций", $tags = "microService")
+   ContainerDb(confDb, "Conferences", "PostgreSQL", "Хранение информации о конференциях]", $tags = "storage")
+
+   Container(reportServ, "Report service", "Java, Spring Boot", "Сервис докладов", $tags = "microService")
+   ContainerDb(reportDb, "Reports", "PostgreSQL", "Хранение информации о докладах]", $tags = "storage")
 }
 
-System_Ext(logistics_system, "msLogistix", "Система управления доставкой товаров.")  
+Rel(app, authServ, "Автоизация, регистрация", "JSON, HTTPS")
+Rel(authServ, authDb, "Хранение информации о пользователях", "JDBC, SQL")
 
-Lay_R(offering_service, ordering_service)
-Lay_R(offering_service, logistics_system)
-Lay_D(offering_service, audit_service)
+Rel(app, confServ, "Работа с конференциями", "JSON, HTTPS")
+Rel(confServ, confDb, "Хранение информации о конференциях", "JDBC, SQL")
 
-Rel(customer, app, "Оформление заказа", "HTTPS")
-Rel(app, offering_service, "Выбор продуктов для корзины(Продукт):корзина", "JSON, HTTPS")
+Rel(app, reportServ, "Работа с докладами", "JSON, HTTPS")
+Rel(reportServ, reportDb, "Хранение информации о докладах", "JDBC, SQL")
 
-Rel(offering_service, message_bus, "Отправка заказа(Корзина)", "AMPQ")
-Rel(offering_service, offering_db, "Сохранение продуктового предложения(Продуктовая спецификация)", "JDBC, SQL")
+Rel(confServ, reportServ, "Получает данные о докладе", "JSON, HTTPS")
+Rel(reportServ, authServ, "Получает данные о докладчике", "JSON, HTTPS")
+Rel(confServ, authServ, "Получает данные о пользователе", "JSON, HTTPS")
 
-Rel(ordering_service, message_bus, "Получение заказа: Корзина", "AMPQ")
-Rel_U(audit_service, message_bus, "Получение события аудита(Событие)", "AMPQ")
-
-Rel(ordering_service, ordering_db, "Сохранение заказа(Заказ)", "SQL")
-Rel(audit_service, audit_store, "Сохранение события(Событие)")
-Rel(ordering_service, logistics_system, "Доставка(Наряд на доставку):Трекинг", "JSON, HTTP")  
-
+Rel(speaker, app, "Подаёт доклад на конференцию", "HTTPS")
+Rel(reviewer, app, "Оценивает качество докладос с экспертной точки зрения", "HTTPS")
+Rel(organizer, app, "Оганизует конференции", "HTTPS")
+Rel(guest, app, "Регистрируется на конференцию;\nПросматривает конференции", "HTTPS")
+Rel(notification, guest, "Направялет напоминание о начале конференции")
+Rel(confServ, notification, "Использует для уведомлений")
+Rel(reportServ, streaming, "Использует для просмотра проведённых докладов")
+Rel(confServ, streaming, "Использует для трансляций конференции")
 SHOW_LEGEND()
 @enduml
 ```
 
 ## Список компонентов
-| Компонент             | Роль/назначение                  |
-|:----------------------|:---------------------------------|
-| *Название компонента* | *Описание назначения компонента* |
+| Компонент             | Роль/назначение                                                                                                           |
+| :-------------------- | :------------------------------------------------------------------------------------------------------------------------ |
+| Authorization service | Сервис авторизации. Хранит информацию о пользователях портала и их ролях. Содержит CRUD методы по работе с пользователями |
+| Conference service    | Сервис конференций. Содержит CRUD методы по работе с конференциями                                                        |
+| Report service        | Сервис докладов. Содержит CRUD методы по работе с докладами                                                               |

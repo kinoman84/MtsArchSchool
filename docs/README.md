@@ -199,7 +199,7 @@ reviewer --> UC13
 <!-- Записи о ключевых принятых архитектурных решениях (ADR) для реализации архитектурно-значимых требований.
 Подробнее: https://confluence.mts.ru/pages/viewpage.action?pageId=421162308
 -->
-- [ADR.NNN Суть решения](adr/adr-template.md)
+- [ADR.NNN Суть решения](adr/adr-main.md)
 
 ### [Контекст решения](context/context.md)
 

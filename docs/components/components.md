@@ -32,23 +32,23 @@ System_Boundary(conf, "Helloconf") {
    ContainerDb(reportDb, "Reports", "PostgreSQL", "Хранение информации о докладах]", $tags = "storage")
 }
 
-Rel(app, authServ, "Автоизация, регистрация", "JSON, HTTPS")
+Rel(app, authServ, "Автоизация, регистрация", "REST, HTTPS")
 Rel(authServ, authDb, "Хранение информации о пользователях", "JDBC, SQL")
 
-Rel(app, confServ, "Работа с конференциями", "JSON, HTTPS")
+Rel(app, confServ, "Работа с конференциями", "REST, HTTPS")
 Rel(confServ, confDb, "Хранение информации о конференциях", "JDBC, SQL")
 
-Rel(app, reportServ, "Работа с докладами", "JSON, HTTPS")
+Rel(app, reportServ, "Работа с докладами", "REST, HTTPS")
 Rel(reportServ, reportDb, "Хранение информации о докладах", "JDBC, SQL")
 
-Rel(confServ, reportServ, "Получает данные о докладе", "JSON, HTTPS")
-Rel(reportServ, authServ, "Получает данные о докладчике", "JSON, HTTPS")
-Rel(confServ, authServ, "Получает данные о пользователе", "JSON, HTTPS")
+Rel(confServ, reportServ, "Получает данные о докладе", "REST, HTTPS")
+Rel(reportServ, authServ, "Получает данные о докладчике", "REST, HTTPS")
+Rel(confServ, authServ, "Получает данные о пользователе", "REST, HTTPS")
 
-Rel(speaker, app, "Подаёт доклад на конференцию", "HTTPS")
-Rel(reviewer, app, "Оценивает качество докладос с экспертной точки зрения", "HTTPS")
-Rel(organizer, app, "Оганизует конференции", "HTTPS")
-Rel(guest, app, "Регистрируется на конференцию;\nПросматривает конференции", "HTTPS")
+Rel(speaker, app, "Подаёт доклад на конференцию", "Browser, HTTPS")
+Rel(reviewer, app, "Оценивает качество докладос с экспертной точки зрения", "Browser, HTTPS")
+Rel(organizer, app, "Оганизует конференции", "Browser, HTTPS")
+Rel(guest, app, "Регистрируется на конференцию;\nПросматривает конференции", "Browser, HTTPS")
 Rel(notification, guest, "Направялет напоминание о начале конференции")
 Rel(confServ, notification, "Использует для уведомлений")
 Rel(reportServ, streaming, "Использует для просмотра проведённых докладов")
